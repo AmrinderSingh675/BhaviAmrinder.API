@@ -18,6 +18,7 @@ public class AuthService : IAuthService
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _tokenService = tokenService;
     }
 
     public async Task<string?> LoginAsync(string email, string password)
