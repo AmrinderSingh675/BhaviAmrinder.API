@@ -38,4 +38,23 @@ public class GenericService<TDto, TEntity> : IGenericService<TDto, TEntity>
 
         return _mapper.Map<TDto>(entity);        // Entity → DTO
     }
+
+    public async Task<TDto?> UpdateAsync(int id, TDto dto)
+    {
+        var existingEntity = await _repository.GetByIdAsync(id);
+
+        if (existingEntity == null)
+        {
+            return default;
+        }
+
+        // Copy values from DTO to the existing entity
+        _mapper.Map(dto, existingEntity);
+
+        await _repository.UpdateAsync(existingEntity);
+
+        return _mapper.Map<TDto>(existingEntity);
+    }
+
+
 }

@@ -6,7 +6,19 @@ using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000") // Your React URL
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials(); // Required if you pass cookies/tokens
+        });
+});
+
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -23,6 +35,9 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 //    .AddJwtBearer();
 
 var app = builder.Build();
+
+// 2. Enable CORS Middleware (Must be placed BEFORE UseAuthorization)
+app.UseCors("AllowReactApp");
 
 using (var scope = app.Services.CreateScope())
 {
@@ -42,10 +57,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-//app.UseAuthentication();
-
-app.UseAuthorization();
+app.UseAuthentication();   
+app.UseAuthorization();    
 
 app.MapControllers();
 
